@@ -16,6 +16,12 @@ public class JpqlMain {
 
         try {
 
+            Member member = new Member();
+            member.setUsername("Rylah");
+            member.setAge(100);
+            em.persist(member);
+
+
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
