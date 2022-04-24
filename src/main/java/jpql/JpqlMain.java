@@ -13,7 +13,7 @@ public class JpqlMain {
         tx.begin();
 
         try {
-
+            // Input
             for (int i = 0; i < 1000; i++) {
                 Member member = new Member();
                 member.setUsername("Rylah " + i);
@@ -22,7 +22,7 @@ public class JpqlMain {
             }
             em.flush();
             em.clear();
-            // 기본 쿼리 시작
+            /* 기본 쿼리 시작
             // 반환타입이 명확한 경우
             TypedQuery<Member> query1 = em.createQuery("select m from Member as m", Member.class);
             TypedQuery<String> query2 = em.createQuery("select m.username from Member as m where m.id = 5L", String.class);
@@ -63,6 +63,46 @@ public class JpqlMain {
                 System.out.println("member.age : " + member.getAge());
             }
             System.out.println("=============== Query 5 ================");
+            // 기본쿼리 종료 */
+            /* 프로젝션 시작 */
+
+            // 엔티티 프로젝션
+            List<Member> resList = em.createQuery("select m from Member as m ", Member.class).getResultList();
+
+            Member findMember = resList.get(0);
+            findMember.setAge(1);
+
+
+            // Inner Join이 묵시적으로 이뤄짐
+            //
+            // 묵시적
+            List<Team> teamListImplicit = em.createQuery("select m.team from Member as m", Team.class).getResultList();
+
+            // 명시적
+            List<Team> teamListExcplicit = em.createQuery("select m.team from Member as m join m.team t", Team.class).getResultList();
+
+
+            // 임베디드 타입 프로젝션
+            List<Address> orderResult = em.createQuery("select o.address from Order as o ", Address.class).getResultList();
+
+
+            // 스칼라 타입 프로젝션
+            List resultScar = em.createQuery("select m.username, m.age from Member as m").getResultList();
+
+            Object o = resultScar.get(0);
+            Object[] res = (Object[]) o;
+            System.out.println("res[0] = " + res[0]);
+            System.out.println("res[0] = " + res[1]);
+
+            List<MemberDTO> resultList = em.createQuery("select new jpql.MemberDTO(m.username, m.age) from Member m", MemberDTO.class).getResultList();
+
+            MemberDTO memberDTO = resultList.get(10);
+            System.out.println("memberDTO = " + memberDTO.getUsername());
+            System.out.println("memberDTO = " + memberDTO.getAge());
+
+            // DTO를 통한 조회
+
+            /**/
 
             tx.commit();
         } catch (Exception e) {
