@@ -64,7 +64,7 @@ public class JpqlMain {
             }
             System.out.println("=============== Query 5 ================");
             // 기본쿼리 종료 */
-            /* 프로젝션 시작 */
+            /* 프로젝션 시작
 
             // 엔티티 프로젝션
             List<Member> resList = em.createQuery("select m from Member as m ", Member.class).getResultList();
@@ -94,16 +94,32 @@ public class JpqlMain {
             System.out.println("res[0] = " + res[0]);
             System.out.println("res[0] = " + res[1]);
 
+
+
+            // DTO를 통한 조회
+            // new를 통해서 새로 패키지명을 적고 해야된다. (생성자 호출)
+            // 다만, querydsl에서 더 편리하게 작성 가능 (컴파일러에서 오류 검출)
             List<MemberDTO> resultList = em.createQuery("select new jpql.MemberDTO(m.username, m.age) from Member m", MemberDTO.class).getResultList();
 
             MemberDTO memberDTO = resultList.get(10);
             System.out.println("memberDTO = " + memberDTO.getUsername());
             System.out.println("memberDTO = " + memberDTO.getAge());
+            */
+            /* 페이징 시작 */
+            // setFirstResult(int startPosition) : 조회 시작 위치 (0부터 시작)
+            // setMaxResult(int maxResult) : 조회할 데이터 수
 
-            // DTO를 통한 조회
+
+            List<Member> result = em.createQuery("select m from Member as m order by m.age desc", Member.class)
+                    .setFirstResult(1)
+                    .setMaxResults(10)
+                    .getResultList();
+            System.out.println("result.size = " + result.size());
+            for (Member memberList : result) {
+                System.out.println("memberList = " + memberList);
+            }
 
             /**/
-
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
